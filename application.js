@@ -5,7 +5,7 @@ var cors = require('cors');
 
 // list the endpoints which you want to make securable here
 var securableEndpoints;
-securableEndpoints = ['/hello'];
+securableEndpoints = ['/hello','/mqtt'];
 
 var app = express();
 
@@ -23,11 +23,15 @@ app.use(express.static(__dirname + '/public'));
 app.use(mbaasExpress.fhmiddleware());
 
 app.use('/hello', require('./lib/hello.js')());
+var mqttSvc=require('./lib/mqtt.js')();
+app.use('/mqtt', mqttSvc);
+app.use('/mqtt/connect', mqttSvc);
+app.use('/mqtt/pub', mqttSvc);
 
 // Important that this is last!
 app.use(mbaasExpress.errorHandler());
 
-var port = process.env.FH_PORT || process.env.OPENSHIFT_NODEJS_PORT || 8001;
+var port = process.env.FH_PORT || process.env.OPENSHIFT_NODEJS_PORT || 8011;
 var host = process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
 app.listen(port, host, function() {
   console.log("App started at: " + new Date() + " on port: " + port); 
